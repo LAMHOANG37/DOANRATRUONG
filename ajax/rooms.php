@@ -40,6 +40,9 @@
     // facilities data decode
     $facility_list = json_decode($_GET['facility_list'],true);
 
+    // area filter
+    $area_filter = isset($_GET['area']) && $_GET['area'] != '' ? $_GET['area'] : null;
+
     // count no. of rooms and ouput variable to store room cards
     $count_rooms = 0;
     $output = "";
@@ -50,8 +53,13 @@
     $settings_r = mysqli_fetch_assoc(mysqli_query($con,$settings_q));
 
 
-    // query for room cards with guests filter
-    $room_res = select("SELECT * FROM `rooms` WHERE `adult`>=? AND `children`>=? AND `status`=? AND `removed`=?",[$adults,$children,1,0],'iiii');
+    // query for room cards with guests and area filter
+    if($area_filter != null){
+      $room_res = select("SELECT * FROM `rooms` WHERE `adult`>=? AND `children`>=? AND `area_id`=? AND `status`=? AND `removed`=?",[$adults,$children,$area_filter,1,0],'iiiii');
+    }
+    else{
+      $room_res = select("SELECT * FROM `rooms` WHERE `adult`>=? AND `children`>=? AND `status`=? AND `removed`=?",[$adults,$children,1,0],'iiii');
+    }
 
     while($room_data = mysqli_fetch_assoc($room_res))
     {
@@ -162,7 +170,7 @@
             <div class='col-md-2 mt-lg-0 mt-md-0 mt-4 text-center'>
               <h6 class='mb-4'>$room_data[price] VND / đêm</h6>
               $book_btn
-              <a href='room_details.php?id=$room_data[id]' class='btn btn-sm w-100 btn-outline-dark shadow-none'>Chi tiết</a>
+              <a href='booking/room_details.php?id=$room_data[id]' class='btn btn-sm w-100 btn-outline-dark shadow-none'>Chi tiết</a>
             </div>
           </div>
         </div>

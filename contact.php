@@ -26,7 +26,11 @@
       <div class="col-lg-6 col-md-6 mb-5 px-4">
 
         <div class="bg-white rounded shadow p-4">
-          <iframe class="w-100 rounded mb-4" height="320px" src="<?php echo $contact_r['iframe'] ?>" loading="lazy"></iframe>
+          <iframe id="mapFrame" class="w-100 rounded mb-4" height="320px" src="<?php echo $contact_r['iframe'] ?>" loading="lazy"></iframe>
+          
+          <button onclick="showMyLocation()" class="btn btn-sm btn-outline-primary mb-3">
+            <i class="bi bi-geo-alt-fill"></i> Hiển thị vị trí của tôi
+          </button>
 
           <h5>Địa chỉ</h5>
           <a href="<?php echo $contact_r['gmap'] ?>" target="_blank" class="d-inline-block text-decoration-none text-dark mb-2">
@@ -112,6 +116,41 @@
   ?>
 
   <?php require('inc/footer.php'); ?>
+
+  <script>
+    function showMyLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          // Tạo URL Google Maps với vị trí hiện tại
+          const mapUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s`;
+          
+          // Cập nhật iframe
+          document.getElementById('mapFrame').src = mapUrl;
+          
+          alert('Đã hiển thị vị trí của bạn trên bản đồ!');
+        }, function(error) {
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              alert('Bạn đã từ chối chia sẻ vị trí. Vui lòng cho phép truy cập vị trí trong cài đặt trình duyệt.');
+              break;
+            case error.POSITION_UNAVAILABLE:
+              alert('Không thể xác định vị trí của bạn.');
+              break;
+            case error.TIMEOUT:
+              alert('Yêu cầu xác định vị trí đã hết thời gian.');
+              break;
+            default:
+              alert('Đã xảy ra lỗi khi lấy vị trí.');
+          }
+        });
+      } else {
+        alert('Trình duyệt của bạn không hỗ trợ Geolocation API.');
+      }
+    }
+  </script>
 
 </body>
 </html>

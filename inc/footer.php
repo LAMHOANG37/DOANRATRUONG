@@ -7,12 +7,17 @@
       </p>
     </div>
     <div class="col-lg-4 p-4">
+      <?php 
+        $base_url = (strpos($_SERVER['PHP_SELF'], '/booking/') !== false || 
+                     strpos($_SERVER['PHP_SELF'], '/user/') !== false || 
+                     strpos($_SERVER['PHP_SELF'], '/payment/') !== false) ? '../' : '';
+      ?>
       <h5 class="mb-3">Liên kết</h5>
-      <a href="index.php" class="d-inline-block mb-2 text-dark text-decoration-none">Trang chủ</a> <br>
-      <a href="rooms.php" class="d-inline-block mb-2 text-dark text-decoration-none">Danh sách phòng</a> <br>
-      <a href="facilities.php" class="d-inline-block mb-2 text-dark text-decoration-none">Tiện ích</a> <br>
-      <a href="contact.php" class="d-inline-block mb-2 text-dark text-decoration-none">Liên hệ</a> <br>
-      <a href="about.php" class="d-inline-block mb-2 text-dark text-decoration-none">Về chúng tôi</a>
+      <a href="<?php echo $base_url; ?>index.php" class="d-inline-block mb-2 text-dark text-decoration-none">Trang chủ</a> <br>
+      <a href="<?php echo $base_url; ?>booking/rooms.php" class="d-inline-block mb-2 text-dark text-decoration-none">Danh sách phòng</a> <br>
+      <a href="<?php echo $base_url; ?>facilities.php" class="d-inline-block mb-2 text-dark text-decoration-none">Tiện ích</a> <br>
+      <a href="<?php echo $base_url; ?>contact.php" class="d-inline-block mb-2 text-dark text-decoration-none">Liên hệ</a> <br>
+      <a href="<?php echo $base_url; ?>about.php" class="d-inline-block mb-2 text-dark text-decoration-none">Về chúng tôi</a>
     </div>
     <div class="col-lg-4 p-4">
         <h5 class="mb-3">Theo dõi chúng tôi</h5>
@@ -203,7 +208,8 @@
 
   function checkLoginToBook(status,room_id){
     if(status){
-      window.location.href='confirm_booking.php?id='+room_id;
+      let base = window.location.pathname.includes('/booking/') || window.location.pathname.includes('/user/') ? '../' : '';
+      window.location.href=base+'booking/confirm_booking.php?id='+room_id;
     }
     else{
       alert('error','Vui lòng đăng nhập để đặt phòng!');

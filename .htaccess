@@ -1,0 +1,13 @@
+Options +FollowSymLinks
+RewriteEngine On
+
+# Allow access to all files
+<FilesMatch "\.php$">
+    Require all granted
+</FilesMatch>
+
+# Set default index file
+DirectoryIndex index.php
+
+# Allow access from all
+Require all granted

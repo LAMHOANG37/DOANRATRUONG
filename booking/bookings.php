@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <?php require('inc/links.php'); ?>
+  <?php require('../inc/links.php'); ?>
   <title><?php echo $settings_r['site_title'] ?> - Lịch sử đặt phòng</title>
 </head>
 <body class="bg-light">
 
   <?php 
-    require('inc/header.php'); 
+    require('../inc/header.php'); 
 
     if(!(isset($_SESSION['login']) && $_SESSION['login']==true)){
-      redirect('index.php');
+      redirect('../index.php');
     }
   ?>
 
@@ -41,6 +41,13 @@
           ORDER BY bo.booking_id DESC";
 
         $result = select($query,[$_SESSION['uId']],'i');
+        
+        if(mysqli_num_rows($result) == 0) {
+          echo "<div class='col-12 text-center'>
+            <h4 class='text-muted'>Bạn chưa có lịch sử đặt phòng nào!</h4>
+            <a href='rooms.php' class='btn btn-primary mt-3'>Đặt phòng ngay</a>
+          </div>";
+        }
 
         while($data = mysqli_fetch_assoc($result))
         {
@@ -50,6 +57,36 @@
 
           $status_bg = "";
           $btn = "";
+          $payment_status = "";
+          $payment_btn = "";
+          
+          // Kiểm tra trạng thái thanh toán
+          if($data['trans_status'] == 'TXN_SUCCESS' && !empty($data['trans_id'])) {
+            $payment_status = "<span class='badge bg-success text-white'>Đã thanh toán</span>";
+          } else if($data['booking_status'] == 'pending') {
+            // Booking pending - kiểm tra thời gian còn lại
+            $created_time = strtotime($data['datentime']);
+            $current_time = time();
+            $elapsed_minutes = floor(($current_time - $created_time) / 60);
+            $remaining_minutes = 15 - $elapsed_minutes;
+            
+            if($remaining_minutes > 0) {
+              $payment_status = "<span class='badge bg-warning text-dark'>Chờ thanh toán</span>";
+              $payment_btn = "
+                <div class='mt-2'>
+                  <small class='text-danger d-block mb-2'>Còn <span id='timer_$data[booking_id]'>$remaining_minutes</span> phút</small>
+                  <a href='../payment/pay_booking.php?booking_id=$data[booking_id]' class='btn btn-success btn-sm shadow-none'>MoMo</a>
+                  <a href='../payment/vnpay_pay_booking.php?booking_id=$data[booking_id]' class='btn btn-primary btn-sm shadow-none'>VNPay</a>
+                </div>";
+            } else {
+              // Quá 15 phút - tự động hủy
+              $cancel_query = "UPDATE `booking_order` SET `booking_status`='cancelled' WHERE `booking_id`=?";
+              update($cancel_query, [$data['booking_id']], 'i');
+              $payment_status = "<span class='badge bg-danger'>Đã hủy (quá hạn)</span>";
+            }
+          } else {
+            $payment_status = "<span class='badge bg-warning text-dark'>Chưa thanh toán</span>";
+          }
           
           if($data['booking_status']=='booked')
           {
@@ -93,14 +130,16 @@
                   <b>Check out: </b> $checkout
                 </p>
                 <p>
-                  <b>Amount: </b> $data[price] VND <br>
+                  <b>Amount: </b> $data[trans_amt] VND <br>
                   <b>Order ID: </b> $data[order_id] <br>
                   <b>Date: </b> $date
                 </p>
                 <p>
                   <span class='badge $status_bg'>$data[booking_status]</span>
+                  $payment_status
                 </p>
                 $btn
+                $payment_btn
               </div>
             </div>
           bookings;
@@ -160,10 +199,22 @@
     }  
     else if(isset($_GET['review_status'])){
       alert('success','Cảm ơn bạn đã để lại đánh giá!');
-    }  
+    }
+    else if(isset($_GET['payment_success'])){
+      alert('success','Thanh toán thành công! Đặt phòng của bạn đã được xác nhận.');
+    }
+    else if(isset($_GET['payment_failed'])){
+      alert('error','Thanh toán thất bại! Vui lòng thử lại.');
+    }
+    else if(isset($_GET['payment_cancelled'])){
+      alert('warning','Bạn đã hủy thanh toán.');
+    }
+    else if(isset($_GET['payment_error'])){
+      alert('error','Có lỗi xảy ra trong quá trình thanh toán!');
+    }
   ?>
 
-  <?php require('inc/footer.php'); ?>
+  <?php require('../inc/footer.php'); ?>
 
   <script>
     function cancel_booking(id)
@@ -176,7 +227,7 @@
 
         xhr.onload = function(){
           if(this.responseText==1){
-            window.location.href="bookings.php?cancel_status=true";
+            window.location.href="../bookings.php?cancel_status=true";
           }
           else{
             alert('error','Huỷ đặt phòng không thành công!');
@@ -206,7 +257,7 @@
       data.append('room_id',review_form.elements['room_id'].value);
 
       let xhr = new XMLHttpRequest();
-      xhr.open("POST","ajax/review_room.php",true);
+      xhr.open("POST","../ajax/review_room.php",true);
 
       xhr.onload = function()
       {

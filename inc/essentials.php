@@ -1,21 +1,23 @@
 <?php
 
   //frontend purpose data
-  define('SITE_URL', 'http://localhost/vietchill-main/vietchill/');
+  define('SITE_URL', 'http://localhost/vinhcenter/');
   define('ABOUT_IMG_PATH',SITE_URL.'images/about/');
   define('CAROUSEL_IMG_PATH',SITE_URL.'images/carousel/');
   define('FACILITIES_IMG_PATH',SITE_URL.'images/facilities/');
   define('ROOMS_IMG_PATH',SITE_URL.'images/rooms/');
   define('USERS_IMG_PATH',SITE_URL.'images/users/');
+  define('HOTELS_IMG_PATH',SITE_URL.'images/hotels/');
 
   //backend upload process needs this data
 
-  define('UPLOAD_IMAGE_PATH',$_SERVER['DOCUMENT_ROOT'].'/vietchill-main/vietchill/images/');
+  define('UPLOAD_IMAGE_PATH',$_SERVER['DOCUMENT_ROOT'].'/vinhcenter/images/');
   define('ABOUT_FOLDER','about/');
   define('CAROUSEL_FOLDER','carousel/');
   define('FACILITIES_FOLDER','facilities/');
   define('ROOMS_FOLDER','rooms/');
   define('USERS_FOLDER','users/');
+  define('HOTELS_FOLDER','hotels/');
 
 	function adminLogin() {
 		session_start();

@@ -190,6 +190,9 @@
                         <div class="mb-3">
                           <label class="form-label fw-bold">iFrame Src</label>
                           <input type="text" name="iframe" id="iframe_inp" class="form-control shadow-none" required>
+                          <button type="button" onclick="getMyLocationAdmin()" class="btn btn-sm btn-outline-primary mt-2">
+                            <i class="bi bi-geo-alt-fill"></i> Lấy vị trí hiện tại
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -257,6 +260,24 @@
 
   <?php require('inc/scripts.php'); ?>
   <script src="scripts/settings.js"></script>
+  
+  <script>
+    function getMyLocationAdmin() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const iframeUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s`;
+          document.getElementById('iframe_inp').value = iframeUrl;
+          alert('Đã lấy vị trí hiện tại! Nhấn "Cập nhật" để lưu.');
+        }, function(error) {
+          alert('Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí trong trình duyệt.');
+        });
+      } else {
+        alert('Trình duyệt không hỗ trợ Geolocation.');
+      }
+    }
+  </script>
 
 </body>
 </html>

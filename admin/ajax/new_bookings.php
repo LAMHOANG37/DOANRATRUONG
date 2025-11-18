@@ -29,6 +29,16 @@
       $checkin = date("d-m-Y",strtotime($data['check_in']));
       $checkout = date("d-m-Y",strtotime($data['check_out']));
 
+      // Kiểm tra trạng thái thanh toán
+      $payment_status = "";
+      if($data['trans_status'] == 'TXN_SUCCESS' && !empty($data['trans_id'])) {
+        $payment_status = "<span class='badge bg-success'>Đã thanh toán</span>";
+      } else if($data['trans_status'] == 'pending') {
+        $payment_status = "<span class='badge bg-warning text-dark'>Chưa thanh toán</span>";
+      } else {
+        $payment_status = "<span class='badge bg-secondary'>Chưa xác định</span>";
+      }
+
       $table_data .="
         <tr>
           <td>$i</td>
@@ -54,6 +64,8 @@
             <b>Paid:</b> $data[trans_amt] VND
             <br>
             <b>Date:</b> $date
+            <br>
+            <b>Trạng thái:</b> $payment_status
           </td>
           <td>
             <button type='button' onclick='assign_room($data[booking_id])' class='btn text-white btn-sm fw-bold custom-bg shadow-none' data-bs-toggle='modal' data-bs-target='#assign-room'>

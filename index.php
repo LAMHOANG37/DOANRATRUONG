@@ -53,13 +53,27 @@
     <div class="row">
       <div class="col-lg-12 bg-white shadow p-4 rounded">
         <h5 class="mb-4 fw-bold h-font">Tiến hành đặt phòng</h5>
-        <form action="rooms.php">
+        <form action="booking/rooms.php">
           <div class="row align-items-end">
-            <div class="col-lg-3 mb-3">
+            <div class="col-lg-2 mb-3">
+              <label class="form-label" style="font-weight: 500;">Khu vực</label>
+              <select class="form-select shadow-none" name="area">
+                <option value="">Tất cả</option>
+                <?php 
+                  $area_q = selectAll('areas');
+                  while($area_row = mysqli_fetch_assoc($area_q)){
+                    if($area_row['status'] == 1){
+                      echo "<option value='$area_row[id]'>$area_row[name]</option>";
+                    }
+                  }
+                ?>
+              </select>
+            </div>
+            <div class="col-lg-2 mb-3">
               <label class="form-label" style="font-weight: 500;">Nhận phòng</label>
               <input type="date" class="form-control shadow-none" name="checkin" required>
             </div>
-            <div class="col-lg-3 mb-3">
+            <div class="col-lg-2 mb-3">
               <label class="form-label" style="font-weight: 500;">Trả phòng</label>
               <input type="date" class="form-control shadow-none" name="checkout" required>
             </div>
@@ -212,7 +226,7 @@
                   $rating_data
                   <div class="d-flex justify-content-evenly mb-2">
                     $book_btn
-                    <a href="room_details.php?id=$room_data[id]" class="btn btn-sm btn-outline-dark shadow-none">Chi tiết</a>
+                    <a href="booking/room_details.php?id=$room_data[id]" class="btn btn-sm btn-outline-dark shadow-none">Chi tiết</a>
                   </div>
                 </div>
               </div>
@@ -224,7 +238,7 @@
       ?>
 
       <div class="col-lg-12 text-center mt-5">
-        <a href="rooms.php" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">Tìm hiểu thêm >>></a>
+        <a href="booking/rooms.php" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">Tìm hiểu thêm >>></a>
       </div>
     </div>
   </div>
@@ -314,7 +328,10 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-md-8 p-4 mb-lg-0 mb-3 bg-white rounded">
-        <iframe class="w-100 rounded" height="320px" src="<?php echo $contact_r['iframe'] ?>" loading="lazy"></iframe>
+        <iframe id="mapFrameHome" class="w-100 rounded mb-3" height="320px" src="<?php echo $contact_r['iframe'] ?>" loading="lazy"></iframe>
+        <button onclick="showMyLocationHome()" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-geo-alt-fill"></i> Hiển thị vị trí của tôi
+        </button>
       </div>
       <div class="col-lg-4 col-md-4">
         <div class="bg-white p-4 rounded mb-4">
@@ -500,6 +517,23 @@
 
       xhr.send(data);
     });
+
+    // Geolocation for home page map
+    function showMyLocationHome() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const mapUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15000!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s`;
+          document.getElementById('mapFrameHome').src = mapUrl;
+          alert('Đã hiển thị vị trí của bạn trên bản đồ!');
+        }, function(error) {
+          alert('Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí trong trình duyệt.');
+        });
+      } else {
+        alert('Trình duyệt không hỗ trợ Geolocation.');
+      }
+    }
 
   </script>
 

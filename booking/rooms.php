@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <?php require('inc/links.php'); ?>
+  <?php require('../inc/links.php'); ?>
   <title><?php echo $settings_r['site_title'] ?> - Danh sách phòng</title>
 </head>
 <body class="bg-light">
 
   <?php 
-    require('inc/header.php'); 
+    require('../inc/header.php'); 
 
     $checkin_default="";
     $checkout_default="";
@@ -44,6 +44,28 @@
               <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse flex-column align-items-stretch mt-2" id="filterDropdown">
+              <!-- Area filter -->
+              <div class="border bg-light p-3 rounded mb-3">
+                <h5 class="d-flex align-items-center justify-content-between mb-3" style="font-size: 18px;">
+                  <span>Khu vực</span>
+                  <button id="area_btn" onclick="area_clear()" class="btn shadow-none btn-sm text-secondary d-none">Làm mới</button>
+                </h5>
+                <?php 
+                  $area_q = selectAll('areas');
+                  while($row = mysqli_fetch_assoc($area_q))
+                  {
+                    if($row['status'] == 1){
+                      echo<<<areas
+                        <div class="mb-2">
+                          <input type="radio" onclick="fetch_rooms()" name="area" value="$row[id]" class="form-check-input shadow-none me-1" id="area$row[id]">
+                          <label class="form-check-label" for="area$row[id]">$row[name]</label>
+                        </div>
+                      areas;
+                    }
+                  }
+                ?>
+              </div>
+
               <!-- Check availablity -->
               <div class="border bg-light p-3 rounded mb-3">
                 <h5 class="d-flex align-items-center justify-content-between mb-3" style="font-size: 18px;">
@@ -118,6 +140,7 @@
     let guests_btn = document.getElementById('guests_btn');
     
     let facilities_btn = document.getElementById('facilities_btn');
+    let area_btn = document.getElementById('area_btn');
 
     function fetch_rooms()
     {
@@ -147,8 +170,19 @@
 
       facility_list = JSON.stringify(facility_list);
 
+      // Get selected area
+      let area_val = '';
+      let get_area = document.querySelector('[name="area"]:checked');
+      if(get_area != null){
+        area_val = get_area.value;
+        area_btn.classList.remove('d-none');
+      }
+      else{
+        area_btn.classList.add('d-none');
+      }
+
       let xhr = new XMLHttpRequest();
-      xhr.open("GET","ajax/rooms.php?fetch_rooms&chk_avail="+chk_avail+"&guests="+guests+"&facility_list="+facility_list,true);
+      xhr.open("GET","../ajax/rooms.php?fetch_rooms&chk_avail="+chk_avail+"&guests="+guests+"&facility_list="+facility_list+"&area="+area_val,true);
 
       xhr.onprogress = function(){
         rooms_data.innerHTML = `<div class="spinner-border text-info mb-3 d-block mx-auto" id="loader" role="status">
@@ -200,6 +234,14 @@
       fetch_rooms();
     }
 
+    function area_clear(){
+      let get_area = document.querySelectorAll('[name="area"]:checked');
+      get_area.forEach((area)=>{
+        area.checked=false;
+      });
+      area_btn.classList.add('d-none');
+      fetch_rooms();
+    }
 
     window.onload = function(){
       fetch_rooms();
@@ -207,7 +249,7 @@
 
   </script>
 
-  <?php require('inc/footer.php'); ?>
+  <?php require('../inc/footer.php'); ?>
 
 </body>
 </html>

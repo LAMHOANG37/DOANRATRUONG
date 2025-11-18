@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <?php require('inc/links.php'); ?>
+  <?php require('../inc/links.php'); ?>
   <title><?php echo $settings_r['site_title'] ?> - Xác nhận đặt phòng</title>
 </head>
 <body class="bg-light">
 
-  <?php require('inc/header.php'); ?>
+  <?php require('../inc/header.php'); ?>
 
   <?php 
 
@@ -93,7 +93,7 @@
       <div class="col-lg-5 col-md-12 px-4">
         <div class="card mb-4 border-0 shadow-sm rounded-3">
           <div class="card-body">
-            <form action="pay_now.php" method="POST" id="booking_form">
+            <form action="../payment/process_payment.php" method="POST" id="booking_form">
               <h6 class="mb-3">Thông tin chi tiết</h6>
               <div class="row">
                 <div class="col-md-6 mb-3">
@@ -124,6 +124,22 @@
 
                   <h6 class="mb-3 text-danger" id="pay_info">Chọn ngày nhận phòng và trả phòng!</h6>
 
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Chọn phương thức thanh toán:</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="payment_method" id="momo" value="momo" checked>
+                      <label class="form-check-label" for="momo">
+                        MoMo
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="payment_method" id="vnpay" value="vnpay">
+                      <label class="form-check-label" for="vnpay">
+                        VNPay
+                      </label>
+                    </div>
+                  </div>
+
                   <button name="pay_now" class="btn w-100 text-white custom-bg shadow-none mb-1" disabled>Thanh toán</button>
                 </div>
               </div>
@@ -136,12 +152,23 @@
   </div>
 
 
-  <?php require('inc/footer.php'); ?>
+  <?php 
+    if(isset($_GET['payment_success'])){
+      echo "<script>alert('success','Thanh toán thành công! Đặt phòng của bạn đã được xác nhận.');</script>";
+    }
+    else if(isset($_GET['payment_failed'])){
+      echo "<script>alert('error','Thanh toán thất bại! Vui lòng thử lại.');</script>";
+    }
+  ?>
+
+  <?php require('../inc/footer.php'); ?>
   <script>
 
     let booking_form = document.getElementById('booking_form');
     let info_loader = document.getElementById('info_loader');
     let pay_info = document.getElementById('pay_info');
+
+
 
     function check_availability()
     {
@@ -163,7 +190,7 @@
         data.append('check_out',checkout_val);
 
         let xhr = new XMLHttpRequest();
-        xhr.open("POST","ajax/confirm_booking.php",true);
+        xhr.open("POST","../ajax/confirm_booking.php",true);
 
         xhr.onload = function()
         {

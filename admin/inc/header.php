@@ -47,6 +47,9 @@
             <a class="nav-link text-white" href="rate_review.php">Đánh giá</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link text-white" href="hotels.php">Khách sạn</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link text-white" href="rooms.php">Danh sách phòng</a>
           </li>
           <li class="nav-item">

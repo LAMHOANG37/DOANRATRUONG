@@ -39,11 +39,11 @@
       }
       else{
         mysqli_stmt_close($stmt);
-        die("Query cannot be executed - Execute");
+        die("Query cannot be executed - Execute: " . mysqli_error($con) . "<br>SQL: " . $sql);
       }
     }
     else{
-      die("Query cannot be executed - Select");
+      die("Query cannot be executed - Select: " . mysqli_error($con) . "<br>SQL: " . $sql . "<br><br>Kiểm tra:<br>1. MySQL đã chạy chưa?<br>2. Database 'vinhcenter' có tồn tại không?<br>3. Bảng trong database đã được tạo chưa?");
     }
   }
 

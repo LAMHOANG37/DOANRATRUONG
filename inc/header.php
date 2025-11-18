@@ -1,25 +1,30 @@
 <nav id="nav-bar" class="navbar navbar-expand-lg navbar-light bg-white px-lg-3 py-lg-2 shadow-sm sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand me-5 fw-bold fs-3 h-font" href="index.php">VinhCenter</a>
+    <?php 
+      $base_url = (strpos($_SERVER['PHP_SELF'], '/booking/') !== false || 
+                   strpos($_SERVER['PHP_SELF'], '/user/') !== false || 
+                   strpos($_SERVER['PHP_SELF'], '/payment/') !== false) ? '../' : '';
+    ?>
+    <a class="navbar-brand me-5 fw-bold fs-3 h-font" href="<?php echo $base_url; ?>index.php">VinhCenter</a>
     <button class="navbar-toggler shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link me-2" href="index.php">Trang chủ</a>
+          <a class="nav-link me-2" href="<?php echo $base_url; ?>index.php">Trang chủ</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link me-2" href="rooms.php">Danh sách phòng</a>
+          <a class="nav-link me-2" href="<?php echo $base_url; ?>booking/rooms.php">Danh sách phòng</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link me-2" href="facilities.php">Tiện ích</a>
+          <a class="nav-link me-2" href="<?php echo $base_url; ?>facilities.php">Tiện ích</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link me-2" href="contact.php">Liên hệ</a>
+          <a class="nav-link me-2" href="<?php echo $base_url; ?>contact.php">Liên hệ</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="about.php">Về chúng tôi</a>
+          <a class="nav-link" href="<?php echo $base_url; ?>about.php">Về chúng tôi</a>
         </li>
       </ul>
       <div class="d-flex">
@@ -34,9 +39,9 @@
                   $_SESSION[uName]
                 </button>
                 <ul class="dropdown-menu dropdown-menu-lg-end">
-                  <li><a class="dropdown-item" href="profile.php">Hồ sơ cá nhân</a></li>
-                  <li><a class="dropdown-item" href="bookings.php">Lịch sử đặt phòng</a></li>
-                  <li><a class="dropdown-item" href="logout.php">Đăng xuất</a></li>
+                  <li><a class="dropdown-item" href="{$base_url}user/profile.php">Hồ sơ cá nhân</a></li>
+                  <li><a class="dropdown-item" href="{$base_url}booking/bookings.php">Lịch sử đặt phòng</a></li>
+                  <li><a class="dropdown-item" href="{$base_url}user/logout.php">Đăng xuất</a></li>
                 </ul>
               </div>
             data;
