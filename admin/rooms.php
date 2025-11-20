@@ -36,6 +36,7 @@
                   <tr class="bg-dark text-light">
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Hotel</th>
                     <th scope="col">Area</th>
                     <th scope="col">Guests</th>
                     <th scope="col">Price</th>
@@ -68,6 +69,20 @@
           </div>
           <div class="modal-body">
             <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label fw-bold">Khách sạn</label>
+                <select name="hotel_id" class="form-select shadow-none" required>
+                  <option value="">Chọn khách sạn</option>
+                  <?php 
+                    $hotel_res = select("SELECT h.id, h.name, a.name as area_name FROM `hotels` h 
+                                        INNER JOIN `areas` a ON h.area_id = a.id 
+                                        WHERE h.status=? AND h.removed=?", [1,0], 'ii');
+                    while($hotel = mysqli_fetch_assoc($hotel_res)){
+                      echo "<option value='$hotel[id]'>$hotel[name] - $hotel[area_name]</option>";
+                    }
+                  ?>
+                </select>
+              </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Tên phòng</label>
                 <input type="text" name="name" class="form-control shadow-none" required>
@@ -154,6 +169,20 @@
           </div>
           <div class="modal-body">
             <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label fw-bold">Khách sạn</label>
+                <select name="hotel_id" class="form-select shadow-none" required>
+                  <option value="">Chọn khách sạn</option>
+                  <?php 
+                    $hotel_res2 = select("SELECT h.id, h.name, a.name as area_name FROM `hotels` h 
+                                        INNER JOIN `areas` a ON h.area_id = a.id 
+                                        WHERE h.status=? AND h.removed=?", [1,0], 'ii');
+                    while($hotel2 = mysqli_fetch_assoc($hotel_res2)){
+                      echo "<option value='$hotel2[id]'>$hotel2[name] - $hotel2[area_name]</option>";
+                    }
+                  ?>
+                </select>
+              </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold">Tên phòng</label>
                 <input type="text" name="name" class="form-control shadow-none" required>

@@ -42,6 +42,9 @@
 
     // area filter
     $area_filter = isset($_GET['area']) && $_GET['area'] != '' ? $_GET['area'] : null;
+    
+    // hotel filter
+    $hotel_filter = isset($_GET['hotel_id']) && $_GET['hotel_id'] != '' ? $_GET['hotel_id'] : null;
 
     // count no. of rooms and ouput variable to store room cards
     $count_rooms = 0;
@@ -53,8 +56,11 @@
     $settings_r = mysqli_fetch_assoc(mysqli_query($con,$settings_q));
 
 
-    // query for room cards with guests and area filter
-    if($area_filter != null){
+    // query for room cards with guests, area and hotel filter
+    if($hotel_filter != null){
+      $room_res = select("SELECT * FROM `rooms` WHERE `adult`>=? AND `children`>=? AND `hotel_id`=? AND `status`=? AND `removed`=?",[$adults,$children,$hotel_filter,1,0],'iiiii');
+    }
+    else if($area_filter != null){
       $room_res = select("SELECT * FROM `rooms` WHERE `adult`>=? AND `children`>=? AND `area_id`=? AND `status`=? AND `removed`=?",[$adults,$children,$area_filter,1,0],'iiiii');
     }
     else{

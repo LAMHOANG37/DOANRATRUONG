@@ -9,6 +9,7 @@ function add_room()
 {
   let data = new FormData();
   data.append('add_room','');
+  data.append('hotel_id',add_room_form.elements['hotel_id'].value);
   data.append('name',add_room_form.elements['name'].value);
   data.append('area',add_room_form.elements['area'].value);
   data.append('price',add_room_form.elements['price'].value);
@@ -79,6 +80,7 @@ function edit_details(id)
   xhr.onload = function(){
     let data = JSON.parse(this.responseText);
 
+    edit_room_form.elements['hotel_id'].value = data.roomdata.hotel_id;
     edit_room_form.elements['name'].value = data.roomdata.name;
     edit_room_form.elements['area'].value = data.roomdata.area;
     edit_room_form.elements['price'].value = data.roomdata.price;
@@ -114,6 +116,7 @@ function submit_edit_room()
   let data = new FormData();
   data.append('edit_room','');
   data.append('room_id',edit_room_form.elements['room_id'].value);
+  data.append('hotel_id',edit_room_form.elements['hotel_id'].value);
   data.append('name',edit_room_form.elements['name'].value);
   data.append('area',edit_room_form.elements['area'].value);
   data.append('price',edit_room_form.elements['price'].value);

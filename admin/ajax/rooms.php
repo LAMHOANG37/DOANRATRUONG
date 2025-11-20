@@ -12,10 +12,10 @@
     $frm_data = filteration($_POST);
     $flag = 0;
 
-    $q1 = "INSERT INTO `rooms` (`name`, `area`, `price`, `quantity`, `adult`, `children`, `description`) VALUES (?,?,?,?,?,?,?)";
-    $values = [$frm_data['name'],$frm_data['area'],$frm_data['price'],$frm_data['quantity'],$frm_data['adult'],$frm_data['children'],$frm_data['desc']];
+    $q1 = "INSERT INTO `rooms` (`hotel_id`, `name`, `area`, `price`, `quantity`, `adult`, `children`, `description`) VALUES (?,?,?,?,?,?,?,?)";
+    $values = [$frm_data['hotel_id'],$frm_data['name'],$frm_data['area'],$frm_data['price'],$frm_data['quantity'],$frm_data['adult'],$frm_data['children'],$frm_data['desc']];
 
-    if(insert($q1,$values,'siiiiis')){
+    if(insert($q1,$values,'isiiiiss')){
       $flag = 1;
     }
     
@@ -77,11 +77,21 @@
         $status = "<button onclick='toggle_status($row[id],1)' class='btn btn-warning btn-sm shadow-none'>inactive</button>";
       }
 
+      // Get hotel name
+      $hotel_name = 'Chưa gán';
+      if($row['hotel_id']){
+        $h_res = mysqli_query($con,"SELECT name FROM hotels WHERE id=$row[hotel_id] LIMIT 1");
+        if($h_res && mysqli_num_rows($h_res) > 0){
+          $h_row = mysqli_fetch_assoc($h_res);
+          $hotel_name = $h_row['name'];
+        }
+      }
 
       $data.="
         <tr class='align-middle'>
           <td>$i</td>
           <td>$row[name]</td>
+          <td>$hotel_name</td>
           <td>$row[area] m2</td>
           <td>
             <span class='badge rounded-pill bg-light text-dark'>
@@ -155,11 +165,11 @@
     $frm_data = filteration($_POST);
     $flag = 0;
 
-    $q1 = "UPDATE `rooms` SET `name`=?,`area`=?,`price`=?,`quantity`=?,
+    $q1 = "UPDATE `rooms` SET `hotel_id`=?,`name`=?,`area`=?,`price`=?,`quantity`=?,
       `adult`=?,`children`=?,`description`=? WHERE `id`=?";
-    $values = [$frm_data['name'],$frm_data['area'],$frm_data['price'],$frm_data['quantity'],$frm_data['adult'],$frm_data['children'],$frm_data['desc'],$frm_data['room_id']];
+    $values = [$frm_data['hotel_id'],$frm_data['name'],$frm_data['area'],$frm_data['price'],$frm_data['quantity'],$frm_data['adult'],$frm_data['children'],$frm_data['desc'],$frm_data['room_id']];
     
-    if(update($q1,$values,'siiiiisi')){
+    if(update($q1,$values,'isiiiisii')){
       $flag = 1;
     }
 

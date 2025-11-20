@@ -181,8 +181,12 @@
         area_btn.classList.add('d-none');
       }
 
+      // Get hotel_id from URL if exists
+      let urlParams = new URLSearchParams(window.location.search);
+      let hotel_id = urlParams.get('hotel_id') || '';
+
       let xhr = new XMLHttpRequest();
-      xhr.open("GET","../ajax/rooms.php?fetch_rooms&chk_avail="+chk_avail+"&guests="+guests+"&facility_list="+facility_list+"&area="+area_val,true);
+      xhr.open("GET","../ajax/rooms.php?fetch_rooms&chk_avail="+chk_avail+"&guests="+guests+"&facility_list="+facility_list+"&area="+area_val+"&hotel_id="+hotel_id,true);
 
       xhr.onprogress = function(){
         rooms_data.innerHTML = `<div class="spinner-border text-info mb-3 d-block mx-auto" id="loader" role="status">

@@ -53,11 +53,11 @@
     <div class="row">
       <div class="col-lg-12 bg-white shadow p-4 rounded">
         <h5 class="mb-4 fw-bold h-font">Tiến hành đặt phòng</h5>
-        <form action="booking/rooms.php">
+        <form action="hotels.php">
           <div class="row align-items-end">
             <div class="col-lg-2 mb-3">
               <label class="form-label" style="font-weight: 500;">Khu vực</label>
-              <select class="form-select shadow-none" name="area">
+              <select class="form-select shadow-none" name="area" id="area_select" onchange="filterHotelsByArea()">
                 <option value="">Tất cả</option>
                 <?php 
                   $area_q = selectAll('areas');
@@ -111,134 +111,72 @@
     </div>
   </div>
 
-  <!-- Our Rooms -->
+  <!-- Our Hotels -->
 
-  <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">Danh sách phòng</h2>
+  <h2 class="mt-5 pt-4 mb-4 text-center fw-bold h-font">Khách sạn nổi bật</h2>
 
   <div class="container">
-    <div class="row">
+    <div class="row" id="hotels-container">
 
       <?php 
             
-        $room_res = select("SELECT * FROM `rooms` WHERE `status`=? AND `removed`=? ORDER BY `id` DESC LIMIT 3",[1,0],'ii');
+        $hotel_res = select("SELECT h.*, a.name as area_name FROM `hotels` h 
+                            INNER JOIN `areas` a ON h.area_id = a.id 
+                            WHERE h.status=? AND h.removed=? ORDER BY h.rating DESC LIMIT 6",[1,0],'ii');
 
-        while($room_data = mysqli_fetch_assoc($room_res))
+        while($hotel_data = mysqli_fetch_assoc($hotel_res))
         {
-          // get features of room
+          // Get hotel image
+          $hotel_img = HOTELS_IMG_PATH.$hotel_data['image'];
 
-          $fea_q = mysqli_query($con,"SELECT f.name FROM `features` f 
-            INNER JOIN `room_features` rfea ON f.id = rfea.features_id 
-            WHERE rfea.room_id = '$room_data[id]'");
+          // Count rooms in hotel
+          $room_count_q = mysqli_query($con,"SELECT COUNT(*) as total FROM `rooms` WHERE `hotel_id`='$hotel_data[id]' AND `status`=1 AND `removed`=0");
+          $room_count = mysqli_fetch_assoc($room_count_q)['total'];
 
-          $features_data = "";
-          while($fea_row = mysqli_fetch_assoc($fea_q)){
-            $features_data .="<span class='badge rounded-pill bg-light text-dark text-wrap me-1 mb-1'>
-              $fea_row[name]
-            </span>";
+          // Rating stars
+          $rating_stars = "";
+          for($i=0; $i<floor($hotel_data['rating']); $i++){
+            $rating_stars .="<i class='bi bi-star-fill text-warning'></i> ";
           }
 
-          // get facilities of room
-
-          $fac_q = mysqli_query($con,"SELECT f.name FROM `facilities` f 
-            INNER JOIN `room_facilities` rfac ON f.id = rfac.facilities_id 
-            WHERE rfac.room_id = '$room_data[id]'");
-
-          $facilities_data = "";
-          while($fac_row = mysqli_fetch_assoc($fac_q)){
-            $facilities_data .="<span class='badge rounded-pill bg-light text-dark text-wrap me-1 mb-1'>
-              $fac_row[name]
-            </span>";
-          }
-
-          // get thumbnail of image
-
-          $room_thumb = ROOMS_IMG_PATH."thumbnail.jpg";
-          $thumb_q = mysqli_query($con,"SELECT * FROM `room_images` 
-            WHERE `room_id`='$room_data[id]' 
-            AND `thumb`='1'");
-
-          if(mysqli_num_rows($thumb_q)>0){
-            $thumb_res = mysqli_fetch_assoc($thumb_q);
-            $room_thumb = ROOMS_IMG_PATH.$thumb_res['image'];
-          }
-
-          $book_btn = "";
-
-          if(!$settings_r['shutdown']){
-            $login=0;
-            if(isset($_SESSION['login']) && $_SESSION['login']==true){
-              $login=1;
-            }
-
-            $book_btn = "<button onclick='checkLoginToBook($login,$room_data[id])' class='btn btn-sm text-white custom-bg shadow-none'>Đặt ngay</button>";
-          }
-
-          $rating_q = "SELECT AVG(rating) AS `avg_rating` FROM `rating_review`
-            WHERE `room_id`='$room_data[id]' ORDER BY `sr_no` DESC LIMIT 20";
-
-          $rating_res = mysqli_query($con,$rating_q);
-          $rating_fetch = mysqli_fetch_assoc($rating_res);
-
-          $rating_data = "";
-
-          if($rating_fetch['avg_rating']!=NULL)
-          {
-            $rating_data = "<div class='rating mb-4'>
-              <h6 class='mb-1'>Rating</h6>
-              <span class='badge rounded-pill bg-light'>
-            ";
-
-            for($i=0; $i<$rating_fetch['avg_rating']; $i++){
-              $rating_data .="<i class='bi bi-star-fill text-warning'></i> ";
-            }
-
-            $rating_data .= "</span>
-              </div>
-            ";
-          }
-
-          // print room card
-
+          // print hotel card
           echo <<<data
             <div class="col-lg-4 col-md-6 my-3">
               <div class="card border-0 shadow" style="max-width: 350px; margin: auto;">
-                <img src="$room_thumb" class="card-img-top">
+                <img src="$hotel_img" class="card-img-top" style="height: 200px; object-fit: cover;">
                 <div class="card-body">
-                  <h5>$room_data[name]</h5>
-                  <h6 class="mb-4">$room_data[price] VND / đêm</h6>
-                  <div class="features mb-4">
-                    <h6 class="mb-1">Không gian</h6>
-                    $features_data
+                  <h5>$hotel_data[name]</h5>
+                  <div class="mb-2">
+                    <span class="badge bg-primary">$hotel_data[area_name]</span>
                   </div>
-                  <div class="facilities mb-4">
-                    <h6 class="mb-1">Facilities</h6>
-                    $facilities_data
-                  </div>
-                  <div class="guests mb-4">
-                    <h6 class="mb-1">Guests</h6>
-                    <span class="badge rounded-pill bg-light text-dark text-wrap">
-                      $room_data[adult] Người lớn
-                    </span>
-                    <span class="badge rounded-pill bg-light text-dark text-wrap">
-                      $room_data[children] Trẻ em
+                  <p class="text-muted small mb-2">
+                    <i class="bi bi-geo-alt-fill"></i> $hotel_data[address]
+                  </p>
+                  <div class="mb-3">
+                    <span class="badge rounded-pill bg-light text-dark">
+                      <i class="bi bi-door-open"></i> $room_count phòng
                     </span>
                   </div>
-                  $rating_data
-                  <div class="d-flex justify-content-evenly mb-2">
-                    $book_btn
-                    <a href="booking/room_details.php?id=$room_data[id]" class="btn btn-sm btn-outline-dark shadow-none">Chi tiết</a>
+                  <div class="rating mb-3">
+                    $rating_stars
+                    <span class="text-muted">($hotel_data[rating])</span>
+                  </div>
+                  <div class="d-flex justify-content-between">
+                    <a href="hotels.php?id=$hotel_data[id]" class="btn btn-sm btn-outline-dark shadow-none">Xem phòng</a>
+                    <a href="tel:$hotel_data[phone]" class="btn btn-sm custom-bg text-white shadow-none">
+                      <i class="bi bi-telephone"></i> Liên hệ
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
           data;
-
         }
 
       ?>
 
       <div class="col-lg-12 text-center mt-5">
-        <a href="booking/rooms.php" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">Tìm hiểu thêm >>></a>
+        <a href="hotels.php" class="btn btn-sm btn-outline-dark rounded-0 fw-bold shadow-none">Xem tất cả khách sạn >>></a>
       </div>
     </div>
   </div>
@@ -534,6 +472,24 @@
         alert('Trình duyệt không hỗ trợ Geolocation.');
       }
     }
+
+    // Filter hotels by area from booking form
+    function filterHotelsByArea() {
+      let area_id = document.getElementById('area_select').value;
+      let xhr = new XMLHttpRequest();
+      xhr.open("GET", "ajax/filter_hotels_home.php?area=" + area_id, true);
+
+      xhr.onload = function() {
+        document.getElementById('hotels-container').innerHTML = this.responseText;
+      }
+
+      xhr.send();
+    }
+
+    // Load hotels on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      filterHotelsByArea();
+    });
 
   </script>
 
